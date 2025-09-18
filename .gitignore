@@ -137,3 +137,11 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Course repo extras
+lab1/fragments/node_modules/
+lab2/fragments-ui/node_modules/
+
+# OS stuff
+Thumbs.db
+.DS_Store
