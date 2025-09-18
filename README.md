@@ -14,7 +14,7 @@ cd lab1/fragments
 npm install
 npm run dev
 
-**### Lab 2 (Frontend - fragments-ui)**
+### **Lab 2 (Frontend - fragments-ui)**
 cd lab2/fragments-ui
 npm install
 npm run dev
