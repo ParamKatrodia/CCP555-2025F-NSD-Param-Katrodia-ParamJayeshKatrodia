@@ -1,25 +1,24 @@
 // src/routes/index.js
 const express = require('express');
-const { version, author } = require('../../package.json');
-const { authenticate } = require('../auth');
-
 const router = express.Router();
 
-// Public health check
+const { author, version } = require('../../package.json');
+const { createSuccessResponse } = require('../response');
+
+// Health check route
 router.get('/', (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
-  if (process.env.LOG_LEVEL === 'debug') {
-    req.log.info({ env: process.env }, 'Environment variables (debug)');
-  }
-  res.status(200).json({
-    status: 'ok',
-    author,
-    githubUrl: 'https://github.com/ParamKatrodia/fragments',
-    version,
-  });
+  res.status(200).json(
+    createSuccessResponse({
+      author,
+      githubUrl: 'https://github.com/ParamKatrodia/CCP555-2025F-NSD-Param-Katrodia-ParamJayeshKatrodia',
+      version,
+    })
+  );
 });
 
-// Secure API (all /v1/*)
+// Expose all API routes on /v1/*
+const { authenticate } = require('../auth');
 router.use('/v1', authenticate(), require('./api'));
 
 module.exports = router;
