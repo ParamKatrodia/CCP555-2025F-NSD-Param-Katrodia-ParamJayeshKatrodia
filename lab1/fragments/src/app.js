@@ -8,7 +8,6 @@ const pinoHttp = require('pino-http');
 
 const logger = require('./logger');
 const auth = require('./auth');
-const { author, version } = require('../package.json');
 
 const app = express();
 
@@ -20,12 +19,15 @@ app.use(compression());
 passport.use(auth.strategy());
 app.use(passport.initialize());
 
+// Mount routes
 app.use('/', require('./routes'));
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ status: 'error', error: { message: 'not found', code: 404 } });
 });
 
+// Error handler
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const status = err.status || 500;
