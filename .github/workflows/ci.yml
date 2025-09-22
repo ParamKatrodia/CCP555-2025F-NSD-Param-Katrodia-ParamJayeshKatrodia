@@ -1,3 +1,4 @@
+# .github/workflows/ci.yml
 name: ci
 
 on:
@@ -12,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: lab1/fragments
+        working-directory: lab1/fragments   
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -22,6 +23,7 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'npm'
+          cache-dependency-path: lab1/fragments/package-lock.json 
 
       - name: Install node dependencies
         run: npm ci
