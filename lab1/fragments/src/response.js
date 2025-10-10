@@ -1,38 +1,22 @@
-// src/response.js
-
 /**
- * A successful response looks like:
- *
- * {
- *   "status": "ok",
- *   ...
- * }
+ * Helpers for consistent API responses
  */
-module.exports.createSuccessResponse = function (data) {
-  return {
-    status: 'ok',
-    // If data exists, spread it into the object
-    ...(data || {}),
-  };
-};
+const createErrorResponse = (code = 500, message = 'unable to process request') => ({
+  status: 'error',
+  error: { code, message },
+});
 
-/**
- * An error response looks like:
- *
- * {
- *   "status": "error",
- *   "error": {
- *     "code": 400,
- *     "message": "invalid request, missing ...",
- *   }
- * }
- */
-module.exports.createErrorResponse = function (code, message) {
-  return {
-    status: 'error',
-    error: {
-      code,
-      message,
-    },
-  };
+const createSuccessResponse = () => ({
+  status: 'ok',
+});
+
+const createSuccessResponseData = (data) => ({
+  status: 'ok',
+  data,
+});
+
+module.exports = {
+  createErrorResponse,
+  createSuccessResponse,
+  createSuccessResponseData,
 };

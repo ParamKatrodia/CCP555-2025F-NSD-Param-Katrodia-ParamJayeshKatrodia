@@ -1,40 +1,46 @@
-// src/app.js
 const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const compression = require('compression');
-const passport = require('passport');
 const pinoHttp = require('pino-http');
-
 const logger = require('./logger');
-const auth = require('./auth');
-const { createErrorResponse } = require('./response');
+const v1 = require('./routes/v1');
+require('./auth/basic-auth'); // registers Basic strategy with passport
 
 const app = express();
 
+// Structured request logging
 app.use(pinoHttp({ logger }));
-app.use(helmet());
-app.use(cors());
-app.use(compression());
 
-passport.use(auth.strategy());
-app.use(passport.initialize());
-
-// Mount routes
-app.use('/', require('./routes'));
-
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json(createErrorResponse(404, 'not found'));
+// Unversioned health, non-cacheable
+app.get('/', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ status: 'ok' });
 });
 
-// Error handler
-// eslint-disable-next-line no-unused-vars
+// Versioned routes
+app.use('/v1', v1);
+
+// 404 handler (must be before the error handler)
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    error: { code: 404, message: 'not found' },
+  });
+});
+
+// Global error handler (must be last)
 app.use((err, req, res, next) => {
-  const status = err.status || 500;
-  const message = err.message || 'unable to process request';
-  if (status > 499) logger.error({ err }, 'Error processing request');
-  res.status(status).json(createErrorResponse(status, message));
+  const status = err?.status || 500;
+
+  // Ensure headers the tests expect
+  res.status(status);
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Cache-Control', 'no-store');
+
+  logger.error({ err }, 'Unhandled error');
+
+  res.json({
+    status: 'error',
+    error: { code: status, message: err?.message || 'internal' },
+  });
 });
 
 module.exports = app;

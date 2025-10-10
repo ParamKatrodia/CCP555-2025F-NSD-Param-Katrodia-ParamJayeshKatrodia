@@ -1,40 +1,38 @@
-// src/auth/cognito.js
-// Passport strategy using AWS Cognito ID token (Bearer JWT)
-
 const passport = require('passport');
-const BearerStrategy = require('passport-http-bearer').Strategy;
 const { CognitoJwtVerifier } = require('aws-jwt-verify');
+const BearerStrategy = require('passport-http-bearer');
+const authorize = require('./auth-middleware');
 
-const logger = require('../logger');
+let verifier;
 
-// Require Cognito env vars in this mode
-if (!(process.env.AWS_COGNITO_POOL_ID && process.env.AWS_COGNITO_CLIENT_ID)) {
-  throw new Error('missing expected env vars: AWS_COGNITO_POOL_ID and AWS_COGNITO_CLIENT_ID');
+function configure() {
+  if (!verifier) {
+    const userPoolId = process.env.AWS_COGNITO_POOL_ID;
+    const clientId = process.env.AWS_COGNITO_CLIENT_ID;
+
+    if (!userPoolId || !clientId) {
+      throw new Error('Missing AWS_COGNITO_POOL_ID or AWS_COGNITO_CLIENT_ID in .env');
+    }
+
+    verifier = CognitoJwtVerifier.create({
+      userPoolId,
+      tokenUse: 'access',
+      clientId,
+    });
+
+    passport.use(
+      new BearerStrategy(async (token, done) => {
+        try {
+          const payload = await verifier.verify(token);
+          done(null, { email: payload.username || payload.email, sub: payload.sub });
+        } catch (e) {
+          done(null, false);
+        }
+      })
+    );
+  }
+  return passport.initialize();
 }
 
-logger.info('Using AWS Cognito for auth');
-
-const jwtVerifier = CognitoJwtVerifier.create({
-  userPoolId: process.env.AWS_COGNITO_POOL_ID,
-  clientId: process.env.AWS_COGNITO_CLIENT_ID,
-  tokenUse: 'id',
-});
-
-jwtVerifier
-  .hydrate()
-  .then(() => logger.info('Cognito JWKS cached'))
-  .catch((err) => logger.error({ err }, 'Unable to cache Cognito JWKS'));
-
-module.exports.strategy = () =>
-  new BearerStrategy(async (token, done) => {
-    try {
-      const user = await jwtVerifier.verify(token);
-      logger.debug({ user }, 'verified user token');
-      done(null, user.email);
-    } catch (err) {
-      logger.error({ err, token }, 'could not verify token');
-      done(null, false);
-    }
-  });
-
-module.exports.authenticate = () => passport.authenticate('bearer', { session: false });
+module.exports.authenticate = () => authorize('bearer');
+module.exports.strategy = configure;

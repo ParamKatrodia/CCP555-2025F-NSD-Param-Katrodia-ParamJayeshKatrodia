@@ -3,12 +3,13 @@ const stoppable = require('stoppable');
 const logger = require('./logger');
 const app = require('./app');
 
-const port = parseInt(process.env.PORT || '8080', 10);
+const port = process.env.PORT ? process.env.PORT : 8080;
 
-const server = stoppable(
-  app.listen(port, () => {
-    logger.info(`Server started on port ${port}`);
-  })
-);
+// Start server without inline callback (lets tests mock cleanly)
+const serverInstance = app.listen(port);
+logger.info(`Server started on port ${port}`);
+
+// Wrap with stoppable for graceful shutdown
+const server = stoppable(serverInstance);
 
 module.exports = server;

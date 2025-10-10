@@ -11,4 +11,11 @@ describe('App 404 handler', () => {
       error: { message: 'not found', code: 404 },
     });
   });
+  test('rejects invalid basic auth credentials', async () => {
+  const res = await request(app)
+    .get('/v1/fragments')
+    .auth('invalid', 'wrong');
+  expect(res.statusCode).toBe(401);
+});
+
 });

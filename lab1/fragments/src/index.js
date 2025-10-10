@@ -1,16 +1,11 @@
-// src/index.js
 require('dotenv').config();
-
+const app = require('./app');
 const logger = require('./logger');
 
-process.on('uncaughtException', (err, origin) => {
-  logger.fatal({ err, origin }, 'uncaughtException');
-  throw err;
+const port = process.env.PORT || 8080;
+
+const server = app.listen(port, () => {
+  logger.info({ msg: `Server started on port ${port}` });
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  logger.fatal({ reason, promise }, 'unhandledRejection');
-  throw reason;
-});
-
-require('./server');
+module.exports = server;

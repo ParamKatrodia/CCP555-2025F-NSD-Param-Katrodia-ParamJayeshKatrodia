@@ -1,11 +1,22 @@
 // jest.config.js
-const path = require('path');
-const envFile = path.join(__dirname, 'env.jest');
-require('dotenv').config({ path: envFile });
-
-console.log(`Using LOG_LEVEL=${process.env.LOG_LEVEL}. Use 'debug' in env.jest for more detail`);
-
 module.exports = {
+  testEnvironment: 'node',
   verbose: true,
-  testTimeout: 5000,
+  collectCoverage: true,
+  collectCoverageFrom: [
+    'src/app.js',
+    'src/model/fragment.js',
+    'src/model/data/memory-db.js',
+    'src/routes/api/get-by-id.js',
+    'src/routes/api/post.js'
+  ],
+  coverageReporters: ['text', 'lcov', 'json-summary'],
+  coverageThreshold: {
+    global: {
+      statements: 85,
+      branches: 80,
+      functions: 85,
+      lines: 85
+    }
+  }
 };
