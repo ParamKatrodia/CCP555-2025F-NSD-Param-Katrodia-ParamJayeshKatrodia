@@ -25,7 +25,7 @@ function configure() {
         try {
           const payload = await verifier.verify(token);
           done(null, { email: payload.username || payload.email, sub: payload.sub });
-        } catch (e) {
+        } catch (_e) {
           done(null, false);
         }
       })
