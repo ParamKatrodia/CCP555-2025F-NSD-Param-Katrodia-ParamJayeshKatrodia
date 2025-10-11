@@ -67,3 +67,17 @@ export async function getUser() {
   const user = await userManager.getUser();
   return user ? formatUser(user) : null;
 }
+
+// Helper function to get the current user's access token
+export async function getAccessToken() {
+  const user = await getUser();
+  if (!user || !user.idToken) {
+    console.warn('No user token found.');
+    return null;
+  }
+
+  // The user object may store tokens differently depending on implementation
+  // Try both common patterns:
+  return user.idToken.jwtToken || user.idToken || null;
+}
+
