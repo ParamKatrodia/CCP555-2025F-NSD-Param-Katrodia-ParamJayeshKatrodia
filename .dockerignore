@@ -1,0 +1,15 @@
+# Ignore local dev and tooling files
+.github/
+.vscode/
+coverage/
+node_modules/
+tests/
+.env
+eslint.config.mjs
+.git/
+.gitignore
+.prettier*
+jest*
+
+# Re-include only the HTPASSWD file inside tests
+!tests/.htpasswd
