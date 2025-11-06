@@ -64,16 +64,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
-        env:
-          DOCKERHUB_REPO: paramkatrodia/fragments
-          SHA_TAG: sha-${{ github.sha }}
-        uses: docker/build-push-action@v6
-        with:
-          context: ./lab5
-          file: ./lab5/Dockerfile
-          push: true
-          tags: |
-            ${{ env.DOCKERHUB_REPO }}:${{ env.SHA_TAG }}
-            ${{ env.DOCKERHUB_REPO }}:main
-            ${{ env.DOCKERHUB_REPO }}:latest
+     - name: Build and push
+  env:
+    DOCKERHUB_REPO: paramkatrodia/fragments
+    SHA_TAG: sha-${{ github.sha }}
+  uses: docker/build-push-action@v6
+  with:
+    context: ./lab5
+    file: ./lab5/Dockerfile
+    push: true
+    tags: ${{ env.DOCKERHUB_REPO }}:${{ env.SHA_TAG }},${{ env.DOCKERHUB_REPO }}:main,${{ env.DOCKERHUB_REPO }}:latest
