@@ -1,49 +1,10 @@
-# .github/workflows/ci.yml
-name: ci
-
-on:
-  pull_request:
-    branches: [ main ]
-  push:
-    branches: [ main ]
-
-jobs:
-  lint:
-    name: ESLint
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: lab5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          cache: npm
-          cache-dependency-path: lab5/package-lock.json
-      - run: npm ci
-      - run: npm run lint
-
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: lab5
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          cache: npm
-          cache-dependency-path: lab5/package-lock.json
-      - run: |
-          npm ci
-          npm test
-
+  # Lint our Dockerfile using Hadolint
   dockerfile-lint:
     name: Dockerfile Lint
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: lab5
     steps:
       - uses: actions/checkout@v4
       - uses: hadolint/hadolint-action@v3.1.0
@@ -55,6 +16,9 @@ jobs:
     needs: [lint, dockerfile-lint, unit-tests]
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -64,13 +28,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-     - name: Build and push
-  env:
-    DOCKERHUB_REPO: paramkatrodia/fragments
-    SHA_TAG: sha-${{ github.sha }}
-  uses: docker/build-push-action@v6
-  with:
-    context: ./lab5
-    file: ./lab5/Dockerfile
-    push: true
-    tags: ${{ env.DOCKERHUB_REPO }}:${{ env.SHA_TAG }},${{ env.DOCKERHUB_REPO }}:main,${{ env.DOCKERHUB_REPO }}:latest
+      - name: Build and push
+        env:
+          DOCKERHUB_REPO: paramkatrodia/fragments
+          SHA_TAG: sha-${{ github.sha }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ./lab5
+          file: ./lab5/Dockerfile
+          push: true
+          tags: ${{ env.DOCKERHUB_REPO }}:${{ env.SHA_TAG }},${{ env.DOCKERHUB_REPO }}:main,${{ env.DOCKERHUB_REPO }}:latest
