@@ -4,14 +4,14 @@
   "version": "0.8.1",
   "description": "Fragments back-end API",
   "scripts": {
-    "lint": "eslint \"./src/**/*.js\"",
-    "start": "node src/index.js",
-    "dev": "node --env-file=debug.env --watch ./src/index.js",
-    "debug": "node --env-file=debug.env --inspect=0.0.0.0:9229 --watch ./src/index.js",
-    "test": "env $(cat env.jest | xargs) jest -c jest.config.js --runInBand --",
-    "test:watch": "env $(cat env.jest | xargs) jest -c jest.config.js --runInBand --watch --",
-    "coverage": "env $(cat env.jest | xargs) jest -c jest.config.js --runInBand --coverage"
-  },
+  "lint": "eslint \"./src/**/*.js\"",
+  "start": "node src/index.js",
+  "dev": "node --env-file=debug.env --watch ./src/index.js",
+  "debug": "node --env-file=debug.env --inspect=0.0.0.0:9229 --watch ./src/index.js",
+  "test": "grep -v '^#' env.jest | xargs env jest -c jest.config.js --runInBand --",
+  "test:watch": "jest -c jest.config.js --runInBand --watch --",
+  "coverage": "jest -c jest.config.js --runInBand --coverage"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ParamKatrodia/fragments.git"
