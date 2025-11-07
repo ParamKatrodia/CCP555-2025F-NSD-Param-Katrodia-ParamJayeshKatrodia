@@ -8,9 +8,9 @@
     "start": "node src/index.js",
     "dev": "node --env-file=debug.env --watch ./src/index.js",
     "debug": "node --env-file=debug.env --inspect=0.0.0.0:9229 --watch ./src/index.js",
-    "test": "jest -c jest.config.js --runInBand --",
-    "test:watch": "jest -c jest.config.js --runInBand --watch --",
-    "coverage": "jest -c jest.config.js --runInBand --coverage"
+    "test": "env $(cat env.jest | xargs) jest -c jest.config.js --runInBand --",
+    "test:watch": "env $(cat env.jest | xargs) jest -c jest.config.js --runInBand --watch --",
+    "coverage": "env $(cat env.jest | xargs) jest -c jest.config.js --runInBand --coverage"
   },
   "repository": {
     "type": "git",
