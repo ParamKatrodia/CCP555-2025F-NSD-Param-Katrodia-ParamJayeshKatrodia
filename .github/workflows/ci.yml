@@ -8,8 +8,11 @@ on:
 
 jobs:
   lint:
-    name: ESLint
+    name: ESLint (Backend)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: fragments-backend
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -19,7 +22,7 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: npm
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: fragments-backend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -28,8 +31,11 @@ jobs:
         run: npm run lint
 
   unit-tests:
-    name: Unit Tests
+    name: Unit Tests (Backend)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: fragments-backend
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -39,7 +45,7 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: npm
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: fragments-backend/package-lock.json
 
       - name: Install dependencies and run tests
         run: |
@@ -47,7 +53,7 @@ jobs:
           npm test
 
   dockerfile-lint:
-    name: Dockerfile Lint
+    name: Dockerfile Lint (Backend)
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -56,7 +62,7 @@ jobs:
       - name: Lint Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: Dockerfile
+          dockerfile: fragments-backend/Dockerfile
 
   docker-hub:
     name: Build and Push to Docker Hub
@@ -78,7 +84,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./fragments-backend
+          file: ./fragments-backend/Dockerfile
           push: true
           tags: paramkatrodia/fragments:sha-${{ github.sha }},paramkatrodia/fragments:main,paramkatrodia/fragments:latest
