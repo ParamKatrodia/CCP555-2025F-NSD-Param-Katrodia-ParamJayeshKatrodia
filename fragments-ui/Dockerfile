@@ -3,16 +3,11 @@
 ############################
 FROM node:18-alpine AS builder
 
-# Create app directory
 WORKDIR /app
 
-# Copy package files
 COPY package.json package-lock.json ./
-
-# Install ALL dependencies (including dev/test)
 RUN npm ci
 
-# Copy the entire backend folder
 COPY . .
 
 ############################
@@ -20,16 +15,17 @@ COPY . .
 ############################
 FROM node:18-alpine AS production
 
-# Create app directory
 WORKDIR /app
 
-# Copy only production dependencies & source
+# Copy only what’s needed for production
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
+COPY --from=builder /app/routes ./routes
+COPY --from=builder /app/auth ./auth
+COPY --from=builder /app/model ./model
+COPY --from=builder /app/lib ./lib
 
-# Expose the API port
 EXPOSE 8080
 
-# Start the API
 CMD ["node", "src/index.js"]
