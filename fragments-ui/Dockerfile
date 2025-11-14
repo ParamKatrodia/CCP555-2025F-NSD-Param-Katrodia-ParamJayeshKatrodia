@@ -1,6 +1,6 @@
-############################
+##############################
 # Stage 1 — Builder
-############################
+##############################
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -10,22 +10,20 @@ RUN npm ci
 
 COPY . .
 
-############################
-# Stage 2 — Production Image
-############################
-FROM node:18-alpine AS production
+# Create dist folder with UI files
+RUN mkdir -p dist \
+  && cp index.html dist/index.html \
+  && cp -R src dist/src
 
-WORKDIR /app
+##############################
+# Stage 2 — Nginx
+##############################
+FROM nginx:alpine
 
-# Copy only what’s needed for production
-COPY --from=builder /app/package.json .
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/routes ./routes
-COPY --from=builder /app/auth ./auth
-COPY --from=builder /app/model ./model
-COPY --from=builder /app/lib ./lib
+RUN rm -rf /usr/share/nginx/html/*
 
-EXPOSE 8080
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-CMD ["node", "src/index.js"]
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

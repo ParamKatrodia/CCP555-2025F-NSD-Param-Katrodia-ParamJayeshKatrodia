@@ -1,6 +1,5 @@
 // src/api.js
-const API_URL = "http://ec2-3-91-79-129.compute-1.amazonaws.com:8080";
-
+const API_URL = "http://18.207.128.92:8080";
 
 import { getAccessToken } from "./auth.js";
 

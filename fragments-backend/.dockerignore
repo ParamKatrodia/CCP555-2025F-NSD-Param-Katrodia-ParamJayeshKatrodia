@@ -1,6 +1,5 @@
 node_modules
 coverage
-tests
 .vscode
 .env
 .env.*

@@ -1,19 +1,21 @@
 // src/auth.js
-import { UserManager } from 'oidc-client-ts';
 
-const poolId   = (process.env.AWS_COGNITO_POOL_ID || '').trim();
-const clientId = (process.env.AWS_COGNITO_CLIENT_ID || '').trim();
-const domain   = (process.env.AWS_COGNITO_DOMAIN_URL || '').replace(/\/+$/, '');
-const redirect = (process.env.OAUTH_SIGN_IN_REDIRECT_URL || 'http://localhost:1234').replace(/\/+$/, '');
+// Load OIDC library from global window
+const { UserManager } = window.oidcClient;
 
-if (!poolId || !clientId || !domain) {
-  throw new Error('Missing env: AWS_COGNITO_POOL_ID / AWS_COGNITO_CLIENT_ID / AWS_COGNITO_DOMAIN_URL');
-}
+// ==== Your AWS Cognito Details ==== //
+const poolId   = "us-east-1_0y76HCUmy";
+const clientId = "723epp6f2na7ggpvgd0r1s0l55";
+const domain   = "https://us-east-10y76hcumy.auth.us-east-1.amazoncognito.com";
+
+// UI URL (EC2)
+const redirect = "http://18.207.128.92";
+
+// ================================== //
 
 const region = poolId.split('_')[0];
 const issuer = `https://cognito-idp.${region}.amazonaws.com/${poolId}`;
 
-// Seed full metadata to avoid discovery (Learner Lab safe)
 const metadataSeed = {
   issuer,
   authorization_endpoint: `${domain}/oauth2/authorize`,
@@ -21,32 +23,26 @@ const metadataSeed = {
   userinfo_endpoint:      `${domain}/oauth2/userInfo`,
   revocation_endpoint:    `${domain}/oauth2/revoke`,
   end_session_endpoint:   `${domain}/logout`,
-  jwks_uri:               `${issuer}/.well-known/jwks.json`,
+  jwks_uri:               `${issuer}/.well-known/jwks.json`
 };
-
-console.log('OIDC (no-discovery) config', { issuer, domain, clientId, redirect });
 
 export const userManager = new UserManager({
   authority: issuer,
   metadataSeed,
   client_id: clientId,
   redirect_uri: redirect,
-  response_type: 'code',
-  scope: 'openid email profile',
-  revokeTokenTypes: ['refresh_token'],
+  response_type: "code",
+  scope: "openid email profile",
   automaticSilentRenew: false,
 });
 
+// Format the user object
 function formatUser(user) {
   return {
-    username: user?.profile?.['cognito:username'],
+    username: user?.profile?.["cognito:username"],
     email: user?.profile?.email,
     idToken: user?.id_token,
     accessToken: user?.access_token,
-    authorizationHeaders: (type = 'application/json') => ({
-      'Content-Type': type,
-      Authorization: `Bearer ${user.id_token}`,
-    }),
   };
 }
 
@@ -59,7 +55,7 @@ export function signOut() {
 }
 
 export async function getUser() {
-  if (window.location.search.includes('code=')) {
+  if (window.location.search.includes("code=")) {
     const user = await userManager.signinCallback();
     window.history.replaceState({}, document.title, window.location.pathname);
     return formatUser(user);
@@ -68,16 +64,8 @@ export async function getUser() {
   return user ? formatUser(user) : null;
 }
 
-// Helper function to get the current user's access token
+// Return access token
 export async function getAccessToken() {
-  const user = await getUser();
-  if (!user || !user.idToken) {
-    console.warn('No user token found.');
-    return null;
-  }
-
-  // The user object may store tokens differently depending on implementation
-  // Try both common patterns:
-  return user.idToken.jwtToken || user.idToken || null;
+  const user = await userManager.getUser();
+  return user ? user.access_token : null;
 }
-

@@ -2,23 +2,46 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Fragments UI (Basic Auth Mode)</title>
+    <title>Fragments UI</title>
+
+    <!-- OIDC Client (Cognito OAuth2 Support) -->
+    <script src="https://cdn.jsdelivr.net/npm/oidc-client-ts@2.0.5/dist/browser/oidc-client-ts.min.js"></script>
+
+    <!-- Load authentication logic first -->
+    <script type="module" src="./src/auth.js"></script>
+
+    <!-- Load main UI logic after auth -->
     <script type="module" src="./src/app.js"></script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      textarea {
+        width: 400px;
+        height: 120px;
+      }
+      button {
+        margin-top: 10px;
+      }
+    </style>
   </head>
+
   <body>
     <h1>Fragments UI</h1>
 
-<section id="user" hidden>
-  <h2>Hello <span id="username"></span>!</h2>
-</section>
+    <section id="user" hidden>
+      <h2>Hello <span id="username"></span>!</h2>
+    </section>
 
-<button id="login">Login</button>
-<button id="logout">Logout</button>
+    <button id="login">Login</button>
+    <button id="logout">Logout</button>
 
-<h2>Create New Fragment</h2>
-<textarea id="fragmentText" rows="4" cols="50"></textarea><br>
-<button id="sendFragment">Send Fragment</button>
+    <h2>Create New Fragment</h2>
+    <textarea id="fragmentText" placeholder="Enter text or JSON"></textarea><br>
+    <button id="sendFragment">Send Fragment</button>
 
-<p id="result"></p>
+    <p id="result"></p>
   </body>
 </html>
