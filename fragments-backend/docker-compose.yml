@@ -1,0 +1,38 @@
+services:
+  fragments:
+    init: true
+    build: .
+    environment:
+      - API_URL=http://localhost:8080
+      - HTPASSWD_FILE=tests/.htpasswd
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+
+      # AWS MOCK SETTINGS
+      - AWS_REGION=us-east-1
+
+      # S3 mock endpoint (LocalStack)
+      - AWS_S3_ENDPOINT_URL=http://localstack:4566
+
+      # DynamoDB mock endpoint (DynamoDB Local)
+      - AWS_DYNAMODB_ENDPOINT_URL=http://dynamodb-local:8000
+
+      # Resource names
+      - AWS_S3_BUCKET_NAME=fragments
+      - AWS_DYNAMODB_TABLE_NAME=fragments
+
+    ports:
+      - "8080:8080"
+
+  dynamodb-local:
+    image: amazon/dynamodb-local
+    command: ['-jar', 'DynamoDBLocal.jar', '-inMemory']
+    ports:
+      - "8000:8000"
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEFAULT_REGION=us-east-1

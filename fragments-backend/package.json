@@ -10,7 +10,8 @@
     "debug": "node --env-file=debug.env --inspect=0.0.0.0:9229 --watch ./src/index.js",
     "test": "cross-env NODE_ENV=test node -r dotenv/config ./node_modules/jest/bin/jest.js -c jest.config.js --runInBand --verbose",
     "test:watch": "jest -c jest.config.js --runInBand --watch --",
-    "coverage": "jest -c jest.config.js --runInBand --coverage"
+    "coverage": "jest -c jest.config.js --runInBand --coverage",
+    "test:integration": "hurl --test --glob \"tests/integration/**/*.hurl\""
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@orangeopensource/hurl": "^7.0.0",
     "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
     "dotenv-cli": "^11.0.0",

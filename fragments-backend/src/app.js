@@ -9,10 +9,15 @@ const app = express();
 // Structured request logging
 app.use(pinoHttp({ logger }));
 
-// Unversioned health, non-cacheable
+// --- HEALTH CHECK ROUTE (UPDATED FOR LAB 8 + HURL TESTS) ---
 app.get('/', (req, res) => {
   res.set('Cache-Control', 'no-store');
-  res.json({ status: 'ok' });
+  res.status(200).json({
+    status: "ok",
+    author: "Param Jayesh Katrodia <pkatroia@myseneca.ca>",
+    githubUrl: "https://github.com/ParamKatrodia/CCP555-2025F-NSD-Param-Katrodia-ParamJayeshKatrodia",
+    version: "1.0.0"
+  });
 });
 
 // Versioned routes
